@@ -13,19 +13,23 @@ URCC = $(shell $(shell urweb -print-ccompiler) -print-prog-name=gcc)
 URINCL = -I$(shell urweb -print-cinclude) $(shell pkg-config --cflags libcurl) $(shell pkg-config --cflags jansson) 
 URVERSION = $(shell urweb -version)
 .PHONY: all
-all: ./persona.exe ./persona.sql
+all: ./Makefile.devel ./persona.exe ./persona.sql
 ./persona.exe: .fix-multy1
-./persona.urp: ./persona.urp.in $(call GUARD,LIBJANSSON) $(call GUARD,LIBLIBCURL)
+./persona.urp: ./Makefile.devel ./persona.urp.in $(call GUARD,LIBJANSSON) $(call GUARD,LIBLIBCURL)
 	cat ./persona.urp.in | sed 's@%LIBCURL%@$(LIBLIBCURL)@' | sed 's@%JANSSON%@$(LIBJANSSON)@' > ./persona.urp
-./persona.urp.in: ./autogen/Urweb_persona_js.ur ./autogen/Urweb_persona_js.urs ./autogen/Urweb_persona_js_c.h ./autogen/Urweb_persona_js_c.o ./ffi.h ./ffi.o ./persona.ur ./persona.urs
+./persona.urp.in: ./Makefile.devel ./autogen/Urweb_persona_js.ur ./autogen/Urweb_persona_js.urs ./autogen/Urweb_persona_js_c.h ./autogen/Urweb_persona_js_c.o ./ffi.h ./ffi.o ./persona.ur ./persona.urs
 	touch ./persona.urp.in
-./autogen/Urweb_persona_js_c.o: ./autogen/Urweb_persona_js_c.c $(call GUARD,URCC) $(call GUARD,URINCL)
+./Cakegen: ./Cakefile.hs
+	cake3
+./Makefile.devel: ./Cakegen ./urweb_persona.js
+	./Cakegen
+./autogen/Urweb_persona_js_c.o: ./Makefile.devel ./autogen/Urweb_persona_js_c.c $(call GUARD,URCC) $(call GUARD,URINCL)
 	$(URCC) -c $(URINCL) -o ./autogen/Urweb_persona_js_c.o ./autogen/Urweb_persona_js_c.c
-./ffi.o: ./ffi.c $(call GUARD,URCC) $(call GUARD,URINCL)
+./ffi.o: ./Makefile.devel ./ffi.c $(call GUARD,URCC) $(call GUARD,URINCL)
 	$(URCC) -c $(URINCL) -o ./ffi.o ./ffi.c
 ./persona.sql: .fix-multy1
 .INTERMEDIATE: .fix-multy1
-.fix-multy1: ./persona.urp $(call GUARD,URVERSION)
+.fix-multy1: ./Makefile.devel ./persona.urp $(call GUARD,URVERSION)
 	urweb -dbms sqlite ./persona
 $(call GUARD,LIBJANSSON):
 	rm -f .cake3/GUARD_LIBJANSSON_*
@@ -55,6 +59,10 @@ all: .fix-multy1
 ./persona.urp: .fix-multy1
 .PHONY: ./persona.urp.in
 ./persona.urp.in: .fix-multy1
+.PHONY: ./Cakegen
+./Cakegen: .fix-multy1
+.PHONY: ./Makefile.devel
+./Makefile.devel: .fix-multy1
 .PHONY: ./autogen/Urweb_persona_js_c.o
 ./autogen/Urweb_persona_js_c.o: .fix-multy1
 .PHONY: ./ffi.o
@@ -64,6 +72,6 @@ all: .fix-multy1
 .INTERMEDIATE: .fix-multy1
 .fix-multy1: 
 	-mkdir .cake3
-	$(MAKE) -f ./Makefile MAIN=1 $(MAKECMDGOALS)
+	$(MAKE) -f ./Makefile.devel MAIN=1 $(MAKECMDGOALS)
 
 endif

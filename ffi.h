@@ -1,4 +1,4 @@
-#include <urweb/urweb.h>
+#include <urweb.h>
 
 /* Make an HTTP post request to the given URL. 'post' should contain the HTTP form
    data. Returns NULL on failure and the result from the URL on success. */

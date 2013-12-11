@@ -1,7 +1,7 @@
 #include <string.h>
-#include <urweb/urweb.h>
 #include <curl/curl.h>
 #include <jansson.h>
+#include <urweb.h>
 #include "ffi.h"
 
 #define BUF_INIT 1024
@@ -73,6 +73,7 @@ uw_Basis_string uw_Ffi_http_post(uw_context ctx, uw_Basis_string url, uw_Basis_s
   curl_easy_setopt(c, CURLOPT_POSTFIELDSIZE, strlen(post));
   curl_easy_setopt(c, CURLOPT_SSL_VERIFYPEER, 1);
   curl_easy_setopt(c, CURLOPT_SSL_VERIFYHOST, 2);
+  curl_easy_setopt(c, CURLOPT_VERBOSE, 1);
 
   code = curl_easy_perform(c);
 

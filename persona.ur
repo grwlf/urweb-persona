@@ -61,12 +61,16 @@ fun checkValidationJson json =
 *)
 fun signin assertion = let 
   val url = "https://verifier.login.persona.org/verify"
-  val assertion = "assertion=" ^ assertion ^ "&audience=http://127.0.0.1:80"
+  (* val assertion = "assertion=" ^ assertion ^ "&audience=http://127.0.0.1:80" *)
+  val assertion = "assertion=" ^ assertion ^ "&audience=http://localhost:8080"
 in
+  debug "signin has been called";
+  debug ("assertion is " ^ assertion);
+  (* return (Some "blabla") *)
   json <- Ffi.http_post url assertion;
   case json of
-  | None => return None
-  | Some json => checkValidationJson json
+  | None => debug "http_post -> none"; return None
+  | Some json =>  debug "http_post -> some";checkValidationJson json
 end
 
 (* Called by the Persona JS code when the user signs out *)
@@ -130,3 +134,6 @@ fun main () =
       <button value="Logout" onclick={fn _ => PersonaFfi.logout ()}/>
     </body>
 </xml>
+
+fun persjs () = Urweb_persona_js.blobpage ()
+

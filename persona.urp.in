@@ -10,8 +10,8 @@ jsFunc PersonaFfi.logout = logout
 jsFunc PersonaFfi.watch = watch
 ffi ./ffi
 link ./ffi.o
-link -L/nix/store/g68n9s40x9wnqlmm8d7c3ca6km64ds9a-jansson-2.4/lib -ljansson  
-link -L/nix/store/j8844hykzj2jn0x0105vsca3mq63lma7-curl-7.30.0/lib -lcurl  
+link %JANSSON%
+link %LIBCURL%
 include ./ffi.h
 safeGet signin
 safeGet signout
