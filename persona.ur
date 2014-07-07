@@ -118,6 +118,37 @@ fun onload s user = PersonaFfi.watch user
                                      (fn () => rpc (signout ());
                                                set s None)
 
+con need = []
+con out = need ++ [Persona={Signal:source (option string), User:option string}]
+
+fun add [t] [t~out] (f:record (dpage (t++out))->transaction page) (r:record (dpage (t ++ need))) = 
+  let
+    val h = <xml>
+        {Script.insert Uru.javascript Urweb_persona_js.geturl}
+      </xml> 
+  in
+    noCompatibilityMode();
+    user <- authedUser ();
+    s <- source user; 
+    f (Uru.addHeader h
+      (Uru.addTag [#Persona] {Signal=s,User=user}
+      (Uru.addOnLoad (onload s user)
+      (r))))
+  end
+
+fun main () = Uru.run
+  (add
+  (Uru.withBody
+  (fn r =>
+    s <- return r.Tags.Persona.Signal;
+    return <xml>
+      <dyn signal={user <- signal s; return (status user)}/>
+      <button value="Login" onclick={fn _ => PersonaFfi.request ()}/>
+      <button value="Logout" onclick={fn _ => PersonaFfi.logout ()}/>
+    </xml>
+  )))
+
+(*
 (* The main entry point for the application. Contains Login/Logout
    buttons and displays something when the login status changes. *)
 fun main () = 
@@ -134,6 +165,5 @@ fun main () =
       <button value="Logout" onclick={fn _ => PersonaFfi.logout ()}/>
     </body>
 </xml>
-
-fun persjs () = Urweb_persona_js.blobpage ()
+*)
 

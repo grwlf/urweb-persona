@@ -1,29 +1,30 @@
 allow mime text/javascript
-rewrite all Persona/*
 database dbname=persona
 sql ./persona.sql
-script /persjs
 script https://login.persona.org/include.js
 ffi ./personaFfi
 jsFunc PersonaFfi.request = request
 jsFunc PersonaFfi.logout = logout
 jsFunc PersonaFfi.watch = watch
 ffi ./ffi
+link -L/nix/store/6zhl2dnf7f1s4gysqksw50hjxd7rzxl5-jansson-2.5/lib -ljansson  
+link -L/nix/store/ml04xmbbwqacjicvlvx0pdllksdi2d4s-curl-7.35.0/lib -lcurl  
 link ./ffi.o
-link -L/nix/store/g68n9s40x9wnqlmm8d7c3ca6km64ds9a-jansson-2.4/lib -ljansson  
-link -L/nix/store/j8844hykzj2jn0x0105vsca3mq63lma7-curl-7.30.0/lib -lcurl  
 include ./ffi.h
-safeGet signin
-safeGet signout
+safeGet Persona/signin
+safeGet Persona/signout
 allow responseHeader X-UA-Compatible
-include ./autogen/Urweb_persona_js_c.h
-link ./autogen/Urweb_persona_js_c.o
-ffi ./autogen/Urweb_persona_js_c
-ffi ./autogen/Urweb_persona_js_js
+include autogen/Urweb_persona_js_c.h
+link autogen/Urweb_persona_js_c.o
+ffi autogen/Urweb_persona_js_c
+ffi autogen/Urweb_persona_js_js
+allow mime text/javascript
 safeGet Urweb_persona_js/blobpage
 safeGet Urweb_persona_js/blob
-safeGet main
-safeGet persjs
+safeGet Persona/main
+safeGet Persona/persjs
+library ./../uru3/Uru
+debug
 
-./autogen/Urweb_persona_js
+autogen/Urweb_persona_js
 ./persona

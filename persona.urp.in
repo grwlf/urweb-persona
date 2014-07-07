@@ -2,16 +2,15 @@ allow mime text/javascript
 rewrite all Persona/*
 database dbname=persona
 sql ./persona.sql
-script /persjs
 script https://login.persona.org/include.js
 ffi ./personaFfi
 jsFunc PersonaFfi.request = request
 jsFunc PersonaFfi.logout = logout
 jsFunc PersonaFfi.watch = watch
 ffi ./ffi
-link ./ffi.o
 link %JANSSON%
 link %LIBCURL%
+link ./ffi.o
 include ./ffi.h
 safeGet signin
 safeGet signout
@@ -24,6 +23,8 @@ safeGet Urweb_persona_js/blobpage
 safeGet Urweb_persona_js/blob
 safeGet main
 safeGet persjs
+library ./../uru2
+debug
 
 ./autogen/Urweb_persona_js
 ./persona

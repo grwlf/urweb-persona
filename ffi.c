@@ -11,13 +11,15 @@
    in the Ur/Web request context. Based on code from:
    http://hg.impredicative.com/openid
 */
-uw_unit uw_Ffi_init(uw_context ctx) {
+uw_unit uw_Ffi_init(uw_context ctx)
+{
   curl_global_init(CURL_GLOBAL_ALL);
 
   return uw_unit_v;
 }
 
-static CURL *curl(uw_context ctx) {
+static CURL *curl(uw_context ctx)
+{
   CURL *r;
 
   if (!(r = uw_get_global(ctx, "curl"))) {
@@ -29,13 +31,15 @@ static CURL *curl(uw_context ctx) {
   return r;
 }
 
-static void free_buffer(void *data) {
+static void free_buffer(void *data)
+{ 
   uw_buffer *buf = data;
   uw_buffer_free(buf);
   free(buf);
 }
 
-static uw_buffer *curl_buffer(uw_context ctx) {
+static uw_buffer *curl_buffer(uw_context ctx)
+{
   uw_buffer *r;
 
   if (!(r = uw_get_global(ctx, "curl_buffer"))) {
@@ -49,7 +53,8 @@ static uw_buffer *curl_buffer(uw_context ctx) {
   return r;
 }
 
-static size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp) {
+static size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp)
+{
   uw_buffer *out = userp;
 
   uw_buffer_append(out, buffer, size * nmemb);
@@ -58,7 +63,8 @@ static size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp) {
 }
 
 /* Make an HTTP POST request using libcurl */
-uw_Basis_string uw_Ffi_http_post(uw_context ctx, uw_Basis_string url, uw_Basis_string post) {
+uw_Basis_string uw_Ffi_http_post(uw_context ctx, uw_Basis_string url, uw_Basis_string post)
+{
   CURL *c = curl(ctx);
   uw_buffer *b = curl_buffer(ctx);
   CURLcode code;
@@ -86,7 +92,8 @@ uw_Basis_string uw_Ffi_http_post(uw_context ctx, uw_Basis_string url, uw_Basis_s
 }
 
 /* Use libjansson to retrieve the value at the given key in the JSON string */
-uw_Basis_string uw_Ffi_json_get_string(uw_context ctx, uw_Basis_string json, uw_Basis_string key) {
+uw_Basis_string uw_Ffi_json_get_string(uw_context ctx, uw_Basis_string json, uw_Basis_string key)
+{
   json_error_t e;
   json_t* o = json_loads(json, 0, &e);
   if (!o) { return NULL; }

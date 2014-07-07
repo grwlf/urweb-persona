@@ -8,34 +8,30 @@ instance IsString File where fromString = file
 
 project = do
 
+  prebuild [cmd|urweb -print-cinclude >/dev/null|]
+
   a <- uwapp "-dbms sqlite" "persona.urp" $ do
     allow mime "text/javascript"
-    rewrite C3.all "Persona/*"
     database "dbname=persona"
     sql "persona.sql"
-    script "/persjs"
     script "https://login.persona.org/include.js"
     ffi "personaFfi"
     jsFunc "PersonaFfi" "request" "request"
     jsFunc "PersonaFfi" "logout" "logout"
     jsFunc "PersonaFfi" "watch" "watch"
-    -- effectful "PersonaFfi.request"
-    -- effectful "PersonaFfi.logout"
-    -- effectful "PersonaFfi.watch"
     ffi "ffi.urs"
-    link "ffi.o"
     pkgconfig "jansson" 
     pkgconfig "libcurl"
+    csrc "ffi.c"
     include "ffi.h"
-    -- benignEffectful "Ffi.http_post"
-    -- benignEffectful "Ffi.json_get_string"
-    safeGet "signin"
-    safeGet "signout"
+    safeGet "Persona.ur" "signin"
+    safeGet "Persona.ur" "signout"
     allow responseHeader "X-UA-Compatible"
-    bin "autogen" "urweb_persona.js"
-    safeGet "main"
-    safeGet "persjs"
-
+    bin "urweb_persona.js" [NoScan]
+    safeGet "Persona.ur" "main"
+    safeGet "Persona.ur" "persjs"
+    library' (externalMake "../uru3/Uru/lib.urp")
+    debug
     ur (pair "persona.ur")
 
   rule $ do

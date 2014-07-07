@@ -10,7 +10,7 @@ function logout() {
 function watch(user, signin, signout) {
   navigator.id.watch( {
     loggedInUser: user,
-    onlogin: function(x) { alert("onlogin") ; execF(execF(signin, x)); },
+    onlogin: function(x) { execF(execF(signin, x)); },
     onlogout: function() { execF(execF(signout)); }
   });
 }
